@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { toggleMenu } from "../utils/appSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GOOGLE_API_KEY } from "../utils/constants";
-
+import { cacheResults } from "../utils/searchSlice";
 const Head = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const  searchCache = useSelector((store)=>store.search);
+  const dispatch = useDispatch();
   useEffect(() => {
+    if (searchCache[searchQuery]){
+      setSuggestions(searchCache[searchQuery]);
+    }else{
+      getSearchSuggestion()
+    }
     const timer = setTimeout(() => getSearchSuggestion(), 200);
 
     return () => {
@@ -21,10 +29,15 @@ const Head = () => {
         GOOGLE_API_KEY
     );
     const json = await data.json();
-
     setSuggestions(json.items);
+
+    dispatch(
+      cacheResults({
+        [searchQuery]  :json.items
+      })
+    )
   };
-  const dispatch = useDispatch();
+  
 
   const toggleMenuHandler = () => {
     dispatch(toggleMenu());
