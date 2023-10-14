@@ -15,7 +15,7 @@ const VideoContainer = () => {
     setVideos(json.items)
   }
   return (
-    <div className='flex flex-wrap'> 
+    <div className='flex flex-wrap items-baseline justify-center'> 
       {
         videos.map((video)=>
           (
